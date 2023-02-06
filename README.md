@@ -1,18 +1,22 @@
-# Hello world JavaScript action
+# GPT Explain Diff JavaScript action
 
-This action prints "Hello World" or "Hello" + the name of a person to greet to the log. To learn how this action was built, see "[Creating a JavaScript action](https://help.github.com/en/articles/creating-a-javascript-action)" in the GitHub Help documentation.
+This action receives as input a git diff (e.g. a PR diff) and asks chatgpt to summarize and explain the changes made in that diff.
 
 ## Inputs
 
-### `who-to-greet`
+### `diff`
 
-**Required** The name of the person to greet. Default `"World"`.
+**Required** The diff to be explained.
+
+### `apikey`
+
+**Required** Your OpenAI api key. See "[OpenAI API](https://openai.com/api/)"
 
 ## Outputs
 
-### `time`
+### `explanation`
 
-The time we greeted you.
+The explanation from GPT3
 
 ## Example usage
 
@@ -21,3 +25,65 @@ uses: actions/hello-world-javascript-action@main
 with:
   who-to-greet: 'Mona the Octocat'
 ```
+
+### To explain the changes made in a PR
+```yaml
+name: Explain PR
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  DIFF: ${{ compare(github.base_ref, github.head_ref) }}
+
+jobs:
+  explain-diff:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Explain Diff
+      uses: actions/explain-diff
+      with:
+        diff: ${{ env.DIFF }}
+        apikey: ${{ secrets.OPENAI_APIKEY }}
+```
+
+### To explain the changes made in a PR and post the result as a comment in the PR itself
+```yaml
+name: Explain PR
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  DIFF: ${{ compare(github.base_ref, github.head_ref) }}
+
+jobs:
+  explain-diff:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Explain Diff
+      uses: actions/explain-diff
+      with:
+        diff: ${{ env.DIFF }}
+        apikey: ${{ secrets.OPENAI_APIKEY }}
+    
+    - name: Post Comment
+      uses: actions/github-script@0.9.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: steps.explain.outputs.explanation
+      run: |
+        const octokit = require('@octokit/rest')({ auth: process.env.GITHUB_TOKEN });
+        octokit.pulls.createComment({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          pull_number: context.payload.pull_request.number,
+          body: steps.explain.outputs.explanation
+        });
+```
+
+ in the GitHub Help documentation.
