@@ -20,12 +20,6 @@ The explanation from GPT3
 
 ## Example usage
 
-```yaml
-uses: actions/hello-world-javascript-action@main
-with:
-  who-to-greet: 'Mona the Octocat'
-```
-
 ### To explain the changes made in a PR
 ```yaml
 name: Explain PR
@@ -43,6 +37,7 @@ jobs:
 
     steps:
     - name: Explain Diff
+      id: explain
       uses: actions/explain-diff
       with:
         diff: ${{ env.DIFF }}
@@ -66,6 +61,7 @@ jobs:
 
     steps:
     - name: Explain Diff
+      id: explain
       uses: actions/explain-diff
       with:
         diff: ${{ env.DIFF }}
@@ -85,5 +81,3 @@ jobs:
           body: steps.explain.outputs.explanation
         });
 ```
-
- in the GitHub Help documentation.
