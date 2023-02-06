@@ -1,4 +1,5 @@
 name: 'GPT Explain Diff'
+icon: message-square
 description: 'Asks OpenAI GPT to explain a git diff'
 inputs:
   diff:
