@@ -1,5 +1,4 @@
 name: 'GPT Explain Diff'
-icon: message-square
 description: 'Asks OpenAI GPT to explain a git diff'
 inputs:
   diff:
@@ -14,3 +13,7 @@ outputs:
 runs:
   using: 'node16'
   main: 'index.js'
+branding:
+  icon: 'message-square'
+  color: 'green'
+
